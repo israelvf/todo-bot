@@ -16,14 +16,19 @@ async def create_list(ctx, list_name):
     embed = discord.Embed()
     list_name = list_name.lower()
     if list_name in lists_dict:
-        embed.color = 0xff0000
+        embed.colour = 0xff0000
         embed.title = f"**List already exists!**"
         embed.description = f"{list_name.capitalize()} already exists"
     else:
-        embed.color = 0x00ff00
+        embed.colour = 0x00ff00
         embed.title = f"**List has been created!**"
         embed.description = f"New list {list_name.capitalize()} has been created!"
-        lists_dict[list_name] = {}
+        embed.set_author(name=ctx.message.author.name,
+                         icon_url="https://cdn.discordapp.com/embed/avatars/0.png")
+        list_content = {}
+        list_content["author"] = ctx.message.author.name
+        list_content["items"] = {}
+        lists_dict[list_name] = list_content
     await ctx.send(embed=embed)
 
 
@@ -32,11 +37,11 @@ async def delete_list(ctx, list_name):
     embed = discord.Embed()
     list_name = list_name.lower()
     if lists_dict.pop(list_name, None) is None:
-        embed.color = 0xff0000
+        embed.colour = 0xff0000
         embed.title = f"**List not found!**"
         embed.description = f"{list_name.capitalize()} was not found"
     else:
-        embed.color = 0x00ff00
+        embed.colour = 0x00ff00
         embed.title = f"**List has been removed!**"
         embed.description = f"{list_name.capitalize()} has been removed!"
     await ctx.send(embed=embed)
@@ -48,16 +53,18 @@ async def add_item(ctx, item, list_name):
     item = item.lower()
     list_name = list_name.lower()
     if list_name not in lists_dict:
-        embed.color = 0xff0000
+        embed.colour = 0xff0000
         embed.title = f"**List not found!**"
         embed.description = f"{list_name.capitalize()} was not found"
     else:
-        lists_dict[list_name][item] = False
-        embed.color = 0x00ff00
+        lists_dict[list_name]["items"][item] = False
+        embed.colour = 0x00ff00
         embed.title = list_name.capitalize()
+        embed.set_author(name=lists_dict[list_name]["author"],
+                         icon_url="https://cdn.discordapp.com/embed/avatars/0.png")
         items = ""
-        for item in lists_dict[list_name]:
-            if lists_dict[list_name][item]:
+        for item in lists_dict[list_name]["items"]:
+            if lists_dict[list_name]["items"][item]:
                 items += f"~~[X] {item.capitalize()}~~\n"
             else:
                 items += f"[ \u200B \u200B ] {item.capitalize()}\n"
@@ -71,20 +78,22 @@ async def remove_item(ctx, item, list_name):
     item = item.lower()
     list_name = list_name.lower()
     if list_name not in lists_dict:
-        embed.color = 0xff0000
+        embed.colour = 0xff0000
         embed.title = f"**List not found!**"
         embed.description = f"{list_name.capitalize()} was not found"
-    elif item not in lists_dict[list_name]:
-        embed.color = 0xff0000
+    elif item not in lists_dict[list_name]["items"]:
+        embed.colour = 0xff0000
         embed.title = f"**Item was not found on list!**"
         embed.description = f"{item.capitalize()} was not found in {list_name.capitalize()}"
     else:
-        lists_dict[list_name].pop(item, None)
-        embed.color = 0x00ff00
+        lists_dict[list_name]["items"].pop(item, None)
+        embed.colour = 0x00ff00
         embed.title = list_name.capitalize()
+        embed.set_author(name=lists_dict[list_name]["author"],
+                         icon_url="https://cdn.discordapp.com/embed/avatars/0.png")
         items = ""
-        for item in lists_dict[list_name]:
-            if lists_dict[list_name][item]:
+        for item in lists_dict[list_name]["items"]:
+            if lists_dict[list_name]["items"][item]:
                 items += f"~~[X] {item.capitalize()}~~\n"
             else:
                 items += f"[ \u200B \u200B ] {item.capitalize()}\n"
@@ -98,20 +107,22 @@ async def set_done(ctx, item, list_name):
     item = item.lower()
     list_name = list_name.lower()
     if list_name not in lists_dict:
-        embed.color = 0xff0000
+        embed.colour = 0xff0000
         embed.title = f"**List not found!**"
         embed.description = f"{list_name.capitalize()} was not found"
-    elif item not in lists_dict[list_name]:
-        embed.color = 0xff0000
+    elif item not in lists_dict[list_name]["items"]:
+        embed.colour = 0xff0000
         embed.title = f"**Item was not found on list!**"
         embed.description = f"{item.capitalize()} was not found in {list_name.capitalize()}"
     else:
-        lists_dict[list_name][item] = True
-        embed.color = 0x00ff00
+        lists_dict[list_name]["items"][item] = True
+        embed.colour = 0x00ff00
         embed.title = list_name.capitalize()
+        embed.set_author(name=lists_dict[list_name]["author"],
+                         icon_url="https://cdn.discordapp.com/embed/avatars/0.png")
         items = ""
-        for item in lists_dict[list_name]:
-            if lists_dict[list_name][item]:
+        for item in lists_dict[list_name]["items"]:
+            if lists_dict[list_name]["items"][item]:
                 items += f"~~[X] {item.capitalize()}~~\n"
             else:
                 items += f"[ \u200B \u200B ] {item.capitalize()}\n"
@@ -124,14 +135,16 @@ async def show_list(ctx, list_name):
     embed = discord.Embed()
     list_name = list_name.lower()
     if list_name not in lists_dict:
-        embed.color = 0xff0000
+        embed.colour = 0xff0000
         embed.title = f"**List not found!**"
         embed.description = f"{list_name.capitalize()} was not found"
     else:
         embed.title = list_name.capitalize()
+        embed.set_author(name=lists_dict[list_name]["author"],
+                         icon_url="https://cdn.discordapp.com/embed/avatars/0.png")
         items = ""
-        for item in lists_dict[list_name]:
-            if lists_dict[list_name][item]:
+        for item in lists_dict[list_name]["items"]:
+            if lists_dict[list_name]["items"][item]:
                 items += f"~~[X] {item.capitalize()}~~\n"
             else:
                 items += f"[ \u200B \u200B ] {item.capitalize()}\n"
